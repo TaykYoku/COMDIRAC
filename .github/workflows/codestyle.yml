@@ -1,0 +1,29 @@
+name: Basic tests
+
+on: [push, pull_request]
+
+jobs:
+
+  pyLint:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'push' || github.repository == 'DIRACGrid/COMDIRAC'
+    defaults:
+      # Activate the conda environment automatically in each step
+      run:
+        shell: bash -l {0}
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        repository: DIRACGrid/DIRAC
+        path: .DIRAC
+        ref: integration
+
+    - name: Prepare environment with Micromamba
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-file: .DIRAC/environment.yml
+
+    - name: Run tests
+      run: pylint -E src/COMDIRAC
